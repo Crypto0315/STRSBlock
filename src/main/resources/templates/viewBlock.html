@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>View Block</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .block-info, .transaction-info {
+            margin-top: 20px;
+        }
+        h1, h3 {
+            margin-bottom: 20px;
+        }
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .show-more {
+            color: blue;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container mt-5">
+    <h1 class="text-center">Block Details</h1>
+    <div id="block-details" class="block-info">
+        <!-- Block details will be loaded here -->
+    </div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.1.1/js/bootstrap.min.js}"></script>
+<script>
+    $(document).ready(function () {
+        $.post('/chain/block/view', function (response) {
+            if (response.code === 200 && response.item) {
+                var block = response.item;
+                var blockDetails = `
+                    <h3>Block Header Information</h3>
+                    <div class="code-block">
+                        <p><strong>Index:</strong> ${block.header.index}</p>
+                        <p><strong>Difficulty:</strong> ${block.header.difficulty}</p>
+                        <p><strong>Nonce:</strong> ${block.header.nonce}</p>
+                        <p><strong>Timestamp:</strong> ${new Date(block.header.timestamp).toLocaleString()}</p>
+                        <p><strong>Hash:</strong> ${block.header.hash}</p>
+                        <p><strong>Previous Hash:</strong> ${block.header.previousHash}</p>
+                    </div>
+
+                    <h3>Transaction Information</h3>
+                    <div id="transactions">
+                        ${block.body.transactions.map(tx => `
+                            <div class="transaction-info">
+                                <div class="code-block">
+                                    ${tx.sender ? `<p><strong>Sender:</strong> ${tx.sender}</p>` : ''}
+                                    ${tx.recipient ? `<p><strong>Recipient:</strong> ${tx.recipient}</p>` : ''}
+                                    ${tx.amount ? `<p><strong>Amount:</strong> ${tx.amount}</p>` : ''}
+                                    ${tx.timestamp ? `<p><strong>Timestamp:</strong> ${new Date(tx.timestamp).toLocaleString()}</p>` : ''}
+                                    ${tx.txHash ? `<p><strong>Tx Hash:</strong> ${tx.txHash}</p>` : ''}
+                                    ${tx.status ? `<p><strong>Status:</strong> ${tx.status}</p>` : ''}
+                                    ${tx.strsSignature ? `<div class="detail-row"><p><strong><i class="fa fa-key"></i> Signature:</strong> ${tx.strsSignature}</p></div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                $('#block-details').html(blockDetails);
+
+                // Add Show More functionality for signatures
+                $('.show-more').on('click', function () {
+                    var fullSignature = $(this).prev('.signature').data('full-signature');
+                    $(this).prev('.signature').text(fullSignature);
+                    $(this).remove(); // Remove the "Show More" button after expanding
+                });
+            } else {
+                $('#block-details').html('<p>Unable to load block information.</p>');
+            }
+        }).fail(function () {
+            alert('Request failed, please try again later.');
+        });
+
+        // Function to truncate long signatures
+        function truncateSignature(signature) {
+            if (signature.length > 30) {
+                return `<span data-full-signature="${signature}">${signature.substring(0, 30)}...</span>`;
+            }
+            return signature;
+        }
+    });
+</script>
+</body>
+</html>

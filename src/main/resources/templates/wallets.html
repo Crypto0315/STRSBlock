@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Wallet List</title>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+
+<body>
+<div class="container mt-5">
+	<h1>Wallet List</h1>
+	<table class="table table-striped">
+		<thead>
+		<tr>
+			<th>Wallet Address</th>
+			<th>Balance</th>
+			<th>Action</th>
+		</tr>
+		</thead>
+		<tbody id="wallet-list">
+		<!-- JavaScript will populate this -->
+		</tbody>
+	</table>
+</div>
+
+<!-- JavaScript to fetch and display data -->
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.1.1/js/bootstrap.min.js}"></script>
+<script>
+	$(document).ready(function() {
+		// Fetch data from the server
+		$.post('/account/list', function(data) {
+			if (data.code === 200 && data.message === "SUCCESS") {  // Check response code and message
+				var accounts = data.item;  // Get the list of accounts
+				var walletList = $('#wallet-list');
+				walletList.empty(); // Clear existing content
+
+				// Iterate over the accounts and add each account's info to the table
+				accounts.forEach(function(account) {
+					var row = $('<tr>');
+					row.append($('<td>').text(account.address));  // Add address
+					row.append($('<td>').text(account.balance));  // Add balance
+
+					// Add detail button
+					var detailButton = $('<button>')
+							.addClass('btn btn-primary')
+							.text('Details')
+							.click(function() {
+								// Redirect to the details page with the wallet address
+								window.location.href = '/account/detail?address=' + encodeURIComponent(account.address);
+							});
+					row.append($('<td>').append(detailButton)); // Add the button to the row
+
+					walletList.append(row);
+				});
+			} else {
+				alert("Unable to load wallet list");
+			}
+		}).fail(function() {
+			alert("Request failed, please try again later");
+		});
+	});
+</script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Set Mining Account</title>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+	<style>
+		body {
+			background-color: #f8f9fa;
+			padding-top: 60px;
+		}
+		.container {
+			max-width: 600px;
+			padding: 15px;
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+		h1 {
+			margin-bottom: 20px;
+			text-align: center;
+		}
+		.form-group {
+			margin-bottom: 15px;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<h1>Set Mining Account</h1>
+	<form id="setCoinbaseForm">
+		<div class="form-group">
+			<label for="address">Wallet Address</label>
+			<input type="text" class="form-control" id="address" placeholder="Enter wallet address" required>
+		</div>
+		<button type="submit" class="btn btn-primary btn-block">Set Mining Account</button>
+	</form>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script>
+	$(document).ready(function() {
+		$('#setCoinbaseForm').on('submit', function(event) {
+			event.preventDefault(); // Prevent default form submission behavior
+
+			var address = $('#address').val().trim();
+			if (!address) {
+				alert('Please enter the wallet address.');
+				return;
+			}
+
+			// Send AJAX request
+			$.ajax({
+				url: '/account/set_coinbase',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify({ address: address }),
+				success: function(response) {
+					if (response.code === 200) {
+						// Redirect to homepage after successful setting
+						window.location.href = '/';
+					} else {
+						alert('Failed to set: ' + response.message);
+					}
+				},
+				error: function() {
+					alert('Request failed, please try again later.');
+				}
+			});
+		});
+	});
+</script>
+</body>
+</html>

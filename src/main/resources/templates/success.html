@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Registration Successful</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+	<link rel="stylesheet" th:href="@{/vendor/font-awesome-4.7.0/css/font-awesome.min.css}">
+</head>
+<body>
+
+<div class="container mt-3">
+	<div class="jumbotron">
+		<h1 class="display-4">Congratulations, Successfully Created</h1>
+		<p class="lead">Below is your wallet's confidential information. Please keep it safe.</p>
+		<hr class="my-4">
+		<p>Wallet Address: <i class="fa fa-clipboard" data-clipboard-target="#address"></i><code id="address" th:text="${account.address}"></code></p>
+		<p>Wallet Private Key 1: <i class="fa fa-clipboard" data-clipboard-target="#privateKey1"></i><code id="privateKey1" th:text="${account.privateKey1}"></code></p>
+		<p>Wallet Private Key 2: <i class="fa fa-clipboard" data-clipboard-target="#privateKey2"></i><code id="privateKey2" th:text="${account.privateKey2}"></code></p>
+	</div>
+	<p class="lead">
+		<a class="btn btn-success btn-lg" href="/" role="button">Return to Homepage »</a>
+	</p>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.1.1/js/bootstrap.min.js}"></script>
+<script th:src="@{/vendor/clipboard/dist/clipboard.min.js}"></script>
+<script th:src="@{/js/success.js}"></script>
+</body>
+
+</html>

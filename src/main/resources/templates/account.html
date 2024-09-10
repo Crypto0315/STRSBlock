@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Account Information</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/4.1.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            padding-top: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            padding: 12px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>New Account Information</h1>
+    <p>Please remember your address and private keys:</p>
+    <p>Address: <span th:text="${account.address}"></span></p> <!-- Using Thymeleaf to bind data -->
+    <p>Private Key 1: <span th:text="${account.privateKey1}"></span></p> <!-- Using Thymeleaf to bind data -->
+    <p>Private Key 2: <span th:text="${account.privateKey2}"></span></p> <!-- Using Thymeleaf to bind data -->
+    <a href="/" class="btn btn-primary">Return to Homepage</a>
+</div>
+
+<script src="/webjars/jquery/3.3.1-1/jquery.min.js"></script>
+</body>
+</html>

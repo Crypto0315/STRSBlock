@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mining Results</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        .container {
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .block-info, .transaction-info {
+            margin-top: 20px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Mining Results</h1>
+    <div id="mineResult" class="block-info">Mining in progress, please wait...</div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script>
+    $(document).ready(function() {
+        // Call mining API
+        $.post('/chain/mine', function(data) {
+            if (data.code === 200 && data.item) {
+                var block = data.item;
+                var header = block.header;
+                var body = block.body;
+                var transactions = body.transactions;
+
+                // Construct HTML for block information
+                var resultHtml = `
+                        <h2>Newly Generated Block Information:</h2>
+                        <div class="code-block">
+                            <p><strong>Block Index:</strong> ${header.index}</p>
+                            <p><strong>Difficulty:</strong> ${header.difficulty}</p>
+                            <p><strong>Nonce:</strong> ${header.nonce}</p>
+                            <p><strong>Timestamp:</strong> ${new Date(header.timestamp).toLocaleString()}</p>
+                            <p><strong>Block Hash:</strong> ${header.hash}</p>
+                            <p><strong>Previous Block Hash:</strong> ${header.previousHash}</p>
+                        </div>
+                        <h2>Transaction Information:</h2>
+                    `;
+
+                // Iterate through transaction information
+                transactions.forEach(function(tx) {
+                    resultHtml += `
+                            <div class="transaction-info">
+                                <div class="code-block">
+                                    <p><strong>Sender:</strong> ${tx.sender || 'None (Miner Reward)'}</p>
+                                    <p><strong>Recipient:</strong> ${tx.recipient}</p>
+                                    <p><strong>Amount:</strong> ${tx.amount}</p>
+                                    <p><strong>Transaction Hash:</strong> ${tx.txHash}</p>
+                                    <p><strong>Status:</strong> ${tx.status}</p>
+                                    <p><strong>Data:</strong> ${tx.data}</p>
+                                    <p><strong>Timestamp:</strong> ${new Date(tx.timestamp).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        `;
+                });
+
+                $('#mineResult').html(resultHtml); // Display mining results
+            } else {
+                $('#mineResult').text(data.message || 'Mining failed, please try again later.');
+            }
+        }).fail(function() {
+            $('#mineResult').text('Request failed, please try again later.');
+        });
+    });
+</script>
+</body>
+</html>

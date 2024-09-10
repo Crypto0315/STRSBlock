@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Mining Account Information</title>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+	<style>
+		body {
+			background-color: #f8f9fa;
+			padding-top: 60px;
+		}
+		.container {
+			max-width: 600px;
+			padding: 20px;
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			text-align: center;
+		}
+		h1 {
+			margin-bottom: 20px;
+		}
+		.account-info {
+			margin-top: 20px;
+			font-size: 1.5em;
+		}
+	</style>
+</head>
+<body>
+<div class="container">
+	<h1>Mining Account Information</h1>
+	<div id="coinbaseResult" class="account-info">Fetching mining account, please wait...</div>
+</div>
+
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script>
+	$(document).ready(function() {
+		// Call the API to get the mining account
+		$.post('/account/get_coinbase', function(data) {
+			if (data.code === 200 && data.item) {
+				var address = data.item;
+				var resultHtml = `
+                        <h3>Mining Account Address:</h3>
+                        <p>${address}</p>
+                    `;
+				$('#coinbaseResult').html(resultHtml); // Display the mining account address
+			} else {
+				$('#coinbaseResult').text(data.message || 'Unable to fetch mining account, please try again later.');
+			}
+		}).fail(function() {
+			$('#coinbaseResult').text('Request failed, please try again later.');
+		});
+	});
+</script>
+</body>
+</html>

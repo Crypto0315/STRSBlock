@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Transaction Page</title>
+	<link rel="stylesheet" th:href="@{/webjars/bootstrap/4.1.1/css/bootstrap.min.css}">
+	<style>
+		body {
+			background-color: #f8f9fa;
+			padding-top: 60px;
+		}
+		.container {
+			max-width: 600px;
+			padding: 15px;
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+		h1 {
+			margin-bottom: 20px;
+			text-align: center;
+		}
+		.form-group {
+			margin-bottom: 20px;
+		}
+		.btn-primary {
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+<header>
+	<h1>Initiate New Transaction</h1>
+</header>
+<div class="container">
+	<form id="transactionForm" novalidate>
+		<div class="form-group">
+			<label for="sender">Sender Address:</label>
+			<input type="text" class="form-control" id="sender" placeholder="Enter sender address" required>
+			<div class="invalid-feedback">Please enter the sender address.</div>
+		</div>
+		<div class="form-group">
+			<label for="recipient">Recipient Address:</label>
+			<input type="text" class="form-control" id="recipient" placeholder="Enter recipient address" required>
+			<div class="invalid-feedback">Please enter the recipient address.</div>
+		</div>
+		<div class="form-group">
+			<label for="amount">Amount:</label>
+			<input type="number" class="form-control" id="amount" placeholder="Enter amount" min="0.01" step="0.01" required>
+			<div class="invalid-feedback">Please enter a valid amount greater than zero.</div>
+		</div>
+		<div class="form-group">
+			<label for="privateKey1">Sender Private Key 1:</label>
+			<input type="text" class="form-control" id="privateKey1" placeholder="Enter sender private key 1" required>
+			<div class="invalid-feedback">Please enter the sender private key 1.</div>
+		</div>
+		<div class="form-group">
+			<label for="privateKey2">Sender Private Key 2:</label>
+			<input type="text" class="form-control" id="privateKey2" placeholder="Enter sender private key 2" required>
+			<div class="invalid-feedback">Please enter the sender private key 2.</div>
+		</div>
+		<button type="button" class="btn btn-primary" onclick="sendTransaction()">Submit Transaction</button>
+	</form>
+</div>
+<script th:src="@{/webjars/jquery/3.3.1-1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/4.1.1/js/bootstrap.min.js}"></script>
+<script>
+	// JavaScript to handle form validation and AJAX request
+	(function() {
+		'use strict';
+		window.addEventListener('load', function() {
+			var forms = document.getElementsByClassName('needs-validation');
+			var validation = Array.prototype.filter.call(forms, function(form) {
+				form.addEventListener('submit', function(event) {
+					if (form.checkValidity() === false) {
+						event.preventDefault();
+						event.stopPropagation();
+					}
+					form.classList.add('was-validated');
+				}, false);
+			});
+		}, false);
+	})();
+
+	function sendTransaction() {
+		var form = document.getElementById('transactionForm');
+		var amount = parseFloat($('#amount').val());
+
+		// Validate that the amount must be greater than 0
+		if (isNaN(amount) || amount <= 0) {
+			$('#amount')[0].setCustomValidity('Amount must be greater than 0.');
+			form.classList.add('was-validated');
+			return;
+		} else {
+			$('#amount')[0].setCustomValidity('');
+		}
+
+		if (form.checkValidity() === false) {
+			form.classList.add('was-validated');
+			return; // If form is invalid, do not proceed
+		}
+
+		var txVo = {
+			sender: $('#sender').val(),
+			recipient: $('#recipient').val(),
+			amount: amount,
+			privateKey1: $('#privateKey1').val(),
+			privateKey2: $('#privateKey2').val()
+		};
+
+		$.ajax({
+			url: '/chain/transactions/new',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(txVo),
+			success: function(response) {
+				if (response.code === 200) {
+					// 交易成功后跳转到钱包列表页面
+					window.location.href = '/account/wallets';
+					console.log(response.item); // 输出交易详情
+				} else {
+					alert('Transaction failed: ' + response.message);
+				}
+			},
+			error: function() {
+				alert('Request failed, please try again later.');
+			}
+		});
+	}
+</script>
+</body>
+</html>
